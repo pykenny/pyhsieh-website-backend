@@ -1,0 +1,11 @@
+django
+diff-match-patch
+pillow
+beautifulsoup4
+django-safedelete
+django-dotenv
+uwsgi
+psycopg2
+mypy
+django-stubs
+

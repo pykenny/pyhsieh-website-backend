@@ -1,0 +1,14 @@
+{
+  "documentTitle": "Test Article with Title Changed",
+  "documentTags": [
+    "tag1",
+    "tag2",
+    "tag3"
+  ],
+  "aliasMapping": {
+    "ikea-shark": "ikea-shark.jpg",
+    "red-fox": "red-fox.jpg",
+    "drunk-cat": "drunk-cat.jpg"
+  },
+  "version": "0.1.0"
+}

@@ -1,0 +1,9 @@
+-c ./prod.txt
+django-debug-toolbar
+ipython
+black
+aiohttp
+aiohttp_cors
+django-extensions
+jsonschema
+

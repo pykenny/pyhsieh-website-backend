@@ -1,0 +1,44 @@
+<h1>Test Part 1</h1>
+<hr>
+<p>This part tests out some basic components needed in blog posts.</p>
+<h2>&lt;h2&gt; Tag</h2>
+<p>Some paragraph</p>
+<h3>&lt;h3&gt; Tag</h3>
+<p>Some other paragraph</p>
+<h4>&lt;h4&gt; Tag</h4>
+<p>One another paragraph</p>
+<h3>List</h3>
+<ul>
+<li>Some List Item</li>
+<li>Some Other List Item
+<ol>
+<li>Nested Ordered Item</li>
+</ol>
+<ul>
+<li>Nested Unordered Item</li>
+</ul>
+</li>
+</ul>
+<h3>Quotes</h3>
+<blockquote>
+<p>&quot;I like strawberries.&quot;, says Marry's lamb.</p>
+<blockquote>
+<p>&quot;Me as well.&quot; another lamb replies so.</p>
+</blockquote>
+</blockquote>
+<h3>Code Block</h3>
+<pre class="hljs"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">addition</span>(<span class="hljs-params">a, b</span>):</span>
+  <span class="hljs-comment"># Binary integer addition operation</span>
+  a_parsed = <span class="hljs-built_in">int</span>(a)
+  b_parsed = <span class="hljs-built_in">int</span>(b)
+  <span class="hljs-keyword">return</span> a + b
+</pre>
+<h1>Test Part 2</h1>
+<hr>
+<p>This part tests out link and image components</p>
+<ul>
+<li>Your best friend on the journey of software (hardware as well) development, <a href="https://google.com">Google.com</a></li>
+</ul>
+<p><div class="image-container"><img src="/img/gerald-schombs-GBDkr3k96DE-unsplash.jpg" alt="Drunk Cat" alias="drunk-cat" title="Placed in the wrong place for testing"><div class="caption">Placed in the wrong place for testing</div></div><br>
+<div class="image-container"><img src="/img/ray-hennessy-xUUZcpQlqpM-unsplash.jpg" alt="Fox" alias="red-fox" title="What does the fox want to say?"><div class="caption">What does the fox want to say?</div></div><br>
+<div class="image-container"><img src="/img/sandy-millar-HoZtQxSpaqo-unsplash.jpg" alt="Rabbit" alias="rabbit-carrot" title="&quot;Today we're gonna to talk about beta-Carotene.&quot;"><div class="caption">"Today we're gonna to talk about beta-Carotene."</div></div></p>

@@ -40,40 +40,43 @@ class ArticleOperations(BaseOperation):
 
         if prefetch_for_blog:
             query = query.select_related("compile_article_data").prefetch_related(
-                "tags_of_article__tag"
+                "tags_of_article__tag",
             )
 
         return query.get(synonym=article_synonym)
 
     @classmethod
-    def get_prev_and_next_article(
+    def get_prev_and_next_article_synonyms(
         cls, article: Article
     ) -> Tuple[Optional[Article], Optional[Article]]:
         prev_post = (
-            cls.base_model.objects.filter(id__lt=article.id).order_by("-id").first()
+            cls.base_model.objects.filter(id__lt=article.id).order_by("-id").values_list("synonym", flat=True).first()
         )
         next_post = (
-            cls.base_model.objects.filter(id__gt=article.id).order_by("id").first()
+            cls.base_model.objects.filter(id__gt=article.id).order_by("id").values_list("synonym", flat=True).first()
         )
 
         return prev_post, next_post
 
     @classmethod
     def get_article_page_list(
-        cls, page: int, page_size: int = 10, tag: Optional[str] = None
+        cls, page: int, page_size: int = 10, tag: Optional[str] = None,
+        prefetch_for_blog: bool = False,
     ) -> ArticlePageListResult:
         """ It's strongly suggested to apply offset for this function. """
         if (not isinstance(page, int)) or page <= 0:
             raise ValueError('"page" can not be float or non-positive integer.')
         if (not isinstance(page_size, int)) or page_size <= 0:
             raise ValueError('"page_size" can not be float or non-positive integer.')
-        has_prev_page = page != 1
+        has_next_page = page != 1
         offset = (page - 1) * page_size
-        article_list = cls.base_model.objects.filter(id__lte=offset)
+        article_list = cls.base_model.objects
         if tag:
             article_list = article_list.filter(tags_of_article__tag_name=tag)
-        article_list = article_list.order_by("-id")[: (page_size + 1)]
-        has_next_page = len(article_list) == page_size + 1
+        if prefetch_for_blog:
+            article_list = article_list.prefetch_related("tags_of_article__tag")
+        article_list = article_list.order_by("-id")[offset: (offset + page_size + 1)]
+        has_prev_page = len(article_list) == page_size + 1
 
         return ArticlePageListResult(
             article_list=article_list,

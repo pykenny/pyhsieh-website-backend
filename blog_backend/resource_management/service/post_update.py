@@ -83,13 +83,16 @@ _HTML_IMAGE_SRC_ATTR: Final = "src"
 _HTML_IMAGE_SRCSET_ATTR: Final = "data-srcset"
 _HTML_LAZYLOAD_SIZE_ATTR: Final = "data-sizes"
 
-_IMG_URL_ROUTE: Final = "/img"
+_IMG_URL_ROUTE: Final = "/img/"
 
 _CLASS_LAZYLOAD: Final = "lazyload"
 _LAZYLOAD_SIZE_AUTO: Final = "auto"
 
-_SRCSET_FORMAT: Final = "/{img_route:s}{{file_name:s}} {{width:d}}w".format(
-    img_route=_IMG_URL_ROUTE
+_SRC_FORMAT: Final = "{img_route:s}{{file_name:s}}".format(
+    img_route=_IMG_URL_ROUTE,
+)
+_SRCSET_FORMAT: Final = "{img_route:s}{{file_name:s}} {{width:d}}w".format(
+    img_route=_IMG_URL_ROUTE,
 )
 
 # LOGGING
@@ -571,7 +574,7 @@ class PostUpdateHandler(object):
                     Image(
                         article=article,
                         alias=alias,
-                        extension=os.path.splitext(file_info.name)[1],
+                        extension=os.path.splitext(file_info.name)[1].replace(',', ''),
                         resolution=resolution,
                         height=image_buffer.size[0],
                         width=image_buffer.size[1],
@@ -624,7 +627,7 @@ class PostUpdateHandler(object):
                     if entry.resolution == Image.ImageResolutionType.LOW:
                         alias_imgattr_mapping[alias][
                             _HTML_IMAGE_SRC_ATTR
-                        ] = get_image_full_path(entry)
+                        ] = _SRC_FORMAT.format(file_name=entry.file_name)
                     srcset_tokens.append(
                         _SRCSET_FORMAT.format(
                             file_name=entry.file_name, width=entry.width

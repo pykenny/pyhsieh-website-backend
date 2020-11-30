@@ -90,6 +90,7 @@ class ImageOperations(BaseOperation, BaseBulkOperation[Image]):
     def get_image_by_file_name(cls, file_name: str) -> Optional[Image]:
         """ Return the object, or None if it doesn't exist in DB """
         uuid_str, ext = splitext(file_name)
+        ext = ext.replace(".", "")
         try:
             return cls.base_model.objects.filter(uuid=uuid_str, extension=ext).get()
         except ObjectDoesNotExist:

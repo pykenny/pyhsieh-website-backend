@@ -17,4 +17,14 @@ update-dev: update-deps init-dev
 
 update-prod: update-deps init-prod
 
-.PHONY: update-deps init-dev init-prod update-dev update-prod
+black-all:
+	python -m black -t py38 "./blog_backend"
+
+flake8-all:
+	python -m flake8 --max-line-length 119 "./blog_backend"
+
+# mypy only works when in project root directory, so we need to switch working dir first.
+mypy-all:
+	pushd blog_backend && python -m mypy --config-file "./mypy.ini" "." || popd
+
+.PHONY: update-deps init-dev init-prod update-dev update-prod black-all flake8-all mypy-all

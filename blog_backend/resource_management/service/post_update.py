@@ -574,7 +574,7 @@ class PostUpdateHandler(object):
                     Image(
                         article=article,
                         alias=alias,
-                        extension=os.path.splitext(file_info.name)[1].replace(',', ''),
+                        extension=os.path.splitext(file_info.name)[1].replace(".", ""),
                         resolution=resolution,
                         height=image_buffer.size[0],
                         width=image_buffer.size[1],

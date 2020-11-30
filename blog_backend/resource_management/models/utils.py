@@ -7,4 +7,3 @@ class BaseModel(models.Model):
 
     # Expose model manager to object attribute
     objects = models.Manager()
-

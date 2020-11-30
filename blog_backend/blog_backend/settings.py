@@ -15,6 +15,7 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
+import dotenv
 
 # Helper Functions
 def get_env_value(name):
@@ -29,13 +30,15 @@ def get_env_value(name):
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+dotenv.read_dotenv(BASE_DIR / ".env")
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = get_env_value("SECRET_KEY")
 
-DEBUG = bool(environ.get("DEBUG", 0))
+DEBUG = bool(int(environ.get("DEBUG", 0)))
 
 ALLOWED_HOSTS = (
     (environ.get("ALLOWED_HOSTS", "").split(",") or [])
@@ -49,21 +52,12 @@ INSTALLED_APPS = [
     "django_extensions",
     "safedelete",
     "resource_management.apps.ResourceManagementConfig",
-    "django.contrib.admin",
-    "django.contrib.auth",
     "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 ROOT_URLCONF = "blog_backend.urls"
@@ -100,31 +94,12 @@ DATABASES = {
         "PORT": get_env_value("DB_PORT"),
         "TEST": {
             "NAME": "",
-        }
+        },
     }
 }
 
 if DEBUG:
     DATABASES["default"]["TEST"]["NAME"] = get_env_value("DB_TEST_NAME")
-
-
-# Password validation
-# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
-]
 
 
 # Internationalization
@@ -153,6 +128,7 @@ PROTECTED_IMAGE_GROUP_TEST = None
 OPENED_IMAGE_DIR_TEST = None
 PROTECTED_IMAGE_DIR_TEST = None
 
+# Test folders for unit test
 if DEBUG:
     OPENED_IMAGE_GROUP_TEST = get_env_value("OPENED_IMAGE_GROUP_TEST")
     PROTECTED_IMAGE_GROUP_TEST = get_env_value("PROTECTED_IMAGE_GROUP_TEST")

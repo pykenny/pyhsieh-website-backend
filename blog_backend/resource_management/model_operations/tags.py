@@ -47,9 +47,7 @@ class ArticleTagOperations(BaseOperation, BaseBulkOperation[ArticleTag]):
 
     @classmethod
     def get_tag_relations_from_article(
-        cls,
-        article: Article,
-        prefetch_tags: bool = False
+        cls, article: Article, prefetch_tags: bool = False
     ) -> QuerySet[ArticleTag]:
         query = cls.base_model.objects.filter(article=article)
         if prefetch_tags:

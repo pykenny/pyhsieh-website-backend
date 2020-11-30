@@ -48,14 +48,11 @@ class BaseBulkOperation(Generic[_T], metaclass=ABCMeta):
     @classmethod
     @transaction.atomic
     def bulk_loose_create(cls, items: Iterable[Dict[str, Any]]) -> List[_T]:
-        """ Note: Django does not support PK filling when 'ignore_conflicts'
-            is enabled in bulk_create(). So we need to iterate through the
-            dicts and call get_or_create() for entries with PK.
+        """Note: Django does not support PK filling when 'ignore_conflicts'
+        is enabled in bulk_create(). So we need to iterate through the
+        dicts and call get_or_create() for entries with PK.
         """
-        return [
-            cls.base_model.objects.get_or_create(**item)[0]
-            for item in items
-        ]
+        return [cls.base_model.objects.get_or_create(**item)[0] for item in items]
 
     @classmethod
     def bulk_update(cls, items: Iterable[_T], fields: Iterable[str]) -> None:

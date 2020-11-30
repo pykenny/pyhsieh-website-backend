@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
 from resource_management.service.blog_post import (
     get_posts_by_page,
@@ -12,21 +13,28 @@ __all__ = [
 ]
 
 
-def posts_by_page(page):
-    result = get_posts_by_page(page)
+@require_GET
+def posts_by_page(_, page):
+    try:
+        result = get_posts_by_page(page, 10)
+    except:
+        result = None
     return JsonResponse(result)
 
 
-def posts_by_page_and_tag(page, tag):
-    result = get_posts_by_page(page, tag)
+@require_GET
+def posts_by_page_and_tag(_, page, tag):
+    result = get_posts_by_page(page, 10, tag)
     return JsonResponse(result)
 
 
-def get_article_data(article_synonym):
+@require_GET
+def get_article_data(_, article_synonym):
     result = get_post_data(article_synonym)
     return JsonResponse(result)
 
 
-def get_tag_list():
+@require_GET
+def get_tag_list(_):
     result = {"data": get_all_tags()}
     return JsonResponse(result)

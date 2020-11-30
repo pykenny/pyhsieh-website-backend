@@ -21,7 +21,7 @@ black-all:
 	python -m black -t py38 "./blog_backend"
 
 flake8-all:
-	python -m flake8 --max-line-length 119 "./blog_backend"
+	python -m flake8 --max-line-length 119 --config "./blog_backend/.flake8" "./blog_backend"
 
 # mypy only works when in project root directory, so we need to switch working dir first.
 mypy-all:

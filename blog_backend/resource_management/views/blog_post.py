@@ -17,7 +17,7 @@ __all__ = [
 def posts_by_page(_, page):
     try:
         result = get_posts_by_page(page, 10)
-    except:
+    except Exception:
         result = None
     return JsonResponse(result)
 

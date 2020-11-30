@@ -84,7 +84,7 @@ class ArticleOperations(BaseOperation):
             article_list = article_list.filter(tags_of_article__tag_name=tag)
         if prefetch_for_blog:
             article_list = article_list.prefetch_related("tags_of_article__tag")
-        article_list = article_list.order_by("-id")[offset : (offset + page_size + 1)]
+        article_list = article_list.order_by("-id")[offset: (offset + page_size + 1)]
         has_prev_page = len(article_list) == page_size + 1
 
         return ArticlePageListResult(

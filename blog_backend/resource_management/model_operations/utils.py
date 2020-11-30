@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Iterable, List, Dict, Any, Generic, TypeVar
+from typing import Iterable, List, Dict, Any, Generic, TypeVar
 
 from django.db import transaction
 from safedelete.models import SafeDeleteModel

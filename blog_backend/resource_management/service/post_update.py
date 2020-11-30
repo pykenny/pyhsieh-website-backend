@@ -127,7 +127,7 @@ class PostUpdateHandler(object):
             target_article = None
             try:
                 target_article = ArticleOperations.get_article_by_synonym(doc_synonym)
-            except ObjectDoesNotExist as _:
+            except ObjectDoesNotExist:
                 update_flag = False
 
             if update_flag:

@@ -1,5 +1,9 @@
 # Source: https://hynek.me/articles/python-app-deps-2018/
 # Remove the part for setuptools because we're not making it a package.
+
+clone-pre-commit-hook:
+	cp -i git_hooks/pre-commit .git/hooks/pre-commit
+
 update-deps:
 	pip install --upgrade pip-tools pip setuptools
 	pip-compile --upgrade --build-isolation --generate-hashes --output-file requirements/prod.txt requirements/prod.in
@@ -27,4 +31,4 @@ flake8-all:
 mypy-all:
 	pushd blog_backend && python -m mypy --config-file "./mypy.ini" "." || popd
 
-.PHONY: update-deps init-dev init-prod update-dev update-prod black-all flake8-all mypy-all
+.PHONY: clone-pre-commit-hook update-deps init-dev init-prod update-dev update-prod black-all flake8-all mypy-all

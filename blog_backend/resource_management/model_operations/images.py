@@ -1,7 +1,5 @@
 from os.path import splitext
-from typing import final, Iterable, Optional
-
-from django.core.exceptions import ObjectDoesNotExist
+from typing import final, Iterable
 
 from safedelete.queryset import SafeDeleteQueryset
 
@@ -20,7 +18,7 @@ __all__ = [
 
 
 @final
-class ImageOperations(BaseOperation, BaseBulkOperation[Image]):
+class ImageOperations(BaseOperation[Image], BaseBulkOperation[Image]):
     base_model = Image
 
     # These methods will pull out all available image data, and exclude
@@ -87,11 +85,9 @@ class ImageOperations(BaseOperation, BaseBulkOperation[Image]):
         return query
 
     @classmethod
-    def get_image_by_file_name(cls, file_name: str) -> Optional[Image]:
+    def get_image_by_file_name(cls, file_name: str) -> Image:
         """ Return the object, or None if it doesn't exist in DB """
         uuid_str, ext = splitext(file_name)
         ext = ext.replace(".", "")
-        try:
-            return cls.base_model.objects.filter(uuid=uuid_str, extension=ext).get()
-        except ObjectDoesNotExist:
-            return None
+
+        return cls.base_model.objects.filter(uuid=uuid_str, extension=ext).get()

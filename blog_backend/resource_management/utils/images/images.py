@@ -6,8 +6,8 @@ from PIL import (
     Image as PILImage,
     ImageFile,
 )
-from collections import OrderedDict as OrderedDictCls
-from typing import Final, final, IO, Optional, OrderedDict
+from collections import OrderedDict
+from typing import Final, final, IO, Optional
 
 from django.conf import settings
 from resource_management.models.images import Image
@@ -52,7 +52,7 @@ def resize_image(
     the list, then a copy of the same image will be provided to the
     lowest resolution.
     """
-    result = OrderedDictCls()
+    result = OrderedDict()
 
     with PILImage.open(fp) as im:
         width, height = im.size

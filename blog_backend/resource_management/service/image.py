@@ -8,7 +8,5 @@ __all__ = [
 
 def get_full_file_path(filename: str) -> dict:
     image_entry = ImageOperations.get_image_by_file_name(filename)
-    if not image_entry:
-        return None
 
     return {"path": get_image_full_path(image_entry)}

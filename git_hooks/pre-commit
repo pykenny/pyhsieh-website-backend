@@ -16,6 +16,6 @@ python -m black -t py38 $python_files
 # Flake8
 python -m flake8 --max-line-length 119 --config "./blog_backend/.flake8" $python_files
 
-# MyPy
-# python -m mypy --config-file "./blog_backend/mypy.ini" $python_files
+# MyPy (only works when in project root directory) (not working now)
+# pushd blog_backend && python -m mypy --config-file "./mypy.ini" $python_files || popd
 

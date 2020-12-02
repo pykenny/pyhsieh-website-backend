@@ -19,7 +19,7 @@ __all__ = [
 
 
 @final
-class TagOperations(BaseOperation, BaseBulkOperation):
+class TagOperations(BaseOperation[Tag], BaseBulkOperation[Tag]):
     base_model = Tag
 
     @classmethod
@@ -42,14 +42,12 @@ class TagOperations(BaseOperation, BaseBulkOperation):
 
 
 @final
-class ArticleTagOperations(BaseOperation, BaseBulkOperation[ArticleTag]):
+class ArticleTagOperations(BaseOperation[ArticleTag], BaseBulkOperation[ArticleTag]):
     base_model = ArticleTag
 
     @classmethod
     def get_tag_relations_from_article(
-        cls,
-        article: Article,
-        prefetch_tags: bool = False
+        cls, article: Article, prefetch_tags: bool = False
     ) -> QuerySet[ArticleTag]:
         query = cls.base_model.objects.filter(article=article)
         if prefetch_tags:

@@ -1,5 +1,6 @@
 import os
 import os.path
+from collections import ItemsView
 from pathlib import Path
 import logging
 from itertools import groupby, chain
@@ -12,6 +13,7 @@ from typing import (
     final,
     Final,
     NamedTuple,
+    IO,
     Tuple,
     Dict,
     List,
@@ -19,6 +21,7 @@ from typing import (
     Iterable,
     Optional,
     Any,
+    Union,
 )
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -127,10 +130,12 @@ class PostUpdateHandler(object):
             target_article = None
             try:
                 target_article = ArticleOperations.get_article_by_synonym(doc_synonym)
-            except ObjectDoesNotExist as _:
+            except ObjectDoesNotExist:
                 update_flag = False
 
-            if update_flag:
+            # The additional logic on target_article is to notify mypy
+            # that target_article is Article instance, instead of None.
+            if update_flag and target_article:
                 if create_only:
                     raise ValueError(
                         "Article synonym '{synonym:s}' has been registered.".format(
@@ -149,22 +154,31 @@ class PostUpdateHandler(object):
                 )
                 cls._create_article(doc_synonym, validated_doc, archive)
 
-    @staticmethod
-    def _get_parsed_meta(archive: TarFile) -> Dict[str, Any]:
+    @classmethod
+    def _extractfile(cls, archive: TarFile, file_info: TarInfo) -> IO[bytes]:
+        """ Wrapper on TarFile.extractfile() to guarantee IO handle is returned. """
+        stream = archive.extractfile(file_info)
+        if not stream:
+            raise ValueError("file_info does not reference to regular file or link.")
+
+        return stream
+
+    @classmethod
+    def _get_parsed_meta(cls, archive: TarFile) -> Dict[str, Any]:
         file_info = archive.getmember(_META_FILENAME)
-        with archive.extractfile(file_info) as r_stream:
+        with cls._extractfile(archive, file_info) as r_stream:
             return json_load(r_stream)
 
-    @staticmethod
-    def _get_raw_document(archive: TarFile) -> str:
+    @classmethod
+    def _get_raw_document(cls, archive: TarFile) -> str:
         file_info = archive.getmember(_RAW_DOC_FILENAME)
-        with archive.extractfile(file_info) as r_stream:
+        with cls._extractfile(archive, file_info) as r_stream:
             return r_stream.read().decode("utf-8")
 
-    @staticmethod
-    def _get_parsed_xml_document(archive: TarFile) -> BeautifulSoup:
+    @classmethod
+    def _get_parsed_xml_document(cls, archive: TarFile) -> BeautifulSoup:
         file_info = archive.getmember(_COMPILED_DOC_FILENAME)
-        with archive.extractfile(file_info) as r_stream:
+        with cls._extractfile(archive, file_info) as r_stream:
             return BeautifulSoup(r_stream, "html.parser")
 
     @staticmethod
@@ -258,7 +272,9 @@ class PostUpdateHandler(object):
             if entry.alias in updated_images:
                 updated_image_info = validated_doc.image_info[entry.alias]
                 original_image_path = get_image_full_path(entry)
-                with archive.extractfile(updated_image_info) as updated_image_stream:
+                with cls._extractfile(
+                    archive, updated_image_info
+                ) as updated_image_stream:
                     if not image_compare(updated_image_stream, original_image_path):
                         renewed_images.add(entry.alias)
                         _LOGGER.info(
@@ -352,7 +368,7 @@ class PostUpdateHandler(object):
                 images_kept=kept_image_entries,
                 images_deleted=removed_image_entries,
             )
-            if created_images:
+            if created_image_entries and created_image_buffers:
                 cls._save_images(
                     created_image_buffers,
                     created_image_entries,
@@ -395,7 +411,7 @@ class PostUpdateHandler(object):
         write_success_flag: bool = False
         try:
             _LOGGER.info("Handling DB write operations...")
-            image_entries, update_flag = cls._run_write_operations(
+            updated_image_entries, update_flag = cls._run_write_operations(
                 article,
                 validated_doc,
                 raw_data_updated=raw_data,
@@ -404,14 +420,20 @@ class PostUpdateHandler(object):
             )
             _LOGGER.info("Done with writing to the DB.")
             _LOGGER.info("Handling image saving...")
-            num_saved_images = cls._save_images(
-                image_buffers, image_entries, validated_doc.image_info, archive
-            )
-            _LOGGER.info(
-                "Complete saving {num_saved_images:d} images.".format(
-                    num_saved_images=num_saved_images,
+            # Logic here is to ensure mypy we're using non-None input on
+            # buffers and entries
+            if image_buffers and updated_image_entries:
+                num_saved_images = cls._save_images(
+                    image_buffers,
+                    updated_image_entries,
+                    validated_doc.image_info,
+                    archive,
                 )
-            )
+                _LOGGER.info(
+                    "Complete saving {num_saved_images:d} images.".format(
+                        num_saved_images=num_saved_images,
+                    )
+                )
             write_success_flag = True
         finally:
             if not write_success_flag:
@@ -519,8 +541,9 @@ class PostUpdateHandler(object):
 
         return images_created, True
 
-    @staticmethod
+    @classmethod
     def _save_images(
+        cls,
         image_buffers: List[PILImage.Image],
         image_entries: List[Image],
         image_info: Dict[str, TarInfo],
@@ -530,7 +553,9 @@ class PostUpdateHandler(object):
             # To copy the original file, we need to stream data from archive
             # instead of copying from PIL.Image buffer.
             if image_entry.resolution == Image.ImageResolutionType.ORIGINAL:
-                with archive.extractfile(image_info[image_entry.alias]) as image_stream:
+                with cls._extractfile(
+                    archive, image_info[image_entry.alias]
+                ) as image_stream:
                     save_image(image_entry, img_stream=image_stream)
                     _LOGGER.info(
                         "Original image '{file_name:s}'({alias:s}) saved.".format(
@@ -552,8 +577,9 @@ class PostUpdateHandler(object):
 
         return len(image_entries)
 
-    @staticmethod
+    @classmethod
     def _create_image_data(
+        cls,
         article: Optional[Article],
         image_info: Dict[str, TarInfo],
         archive: TarFile,
@@ -562,19 +588,24 @@ class PostUpdateHandler(object):
         image_entries = []
         image_buffers = []
 
-        image_info_iter = (
-            filter(lambda x: x[0] in filter_list, image_info.items())
-            if filter_list is not None
-            else image_info.items()
-        )
+        image_info_iter: Union[
+            Iterable[Tuple[str, TarInfo]], ItemsView[str, TarInfo]
+        ] = image_info.items()
+        if filter_list:
+            image_info_iter = (
+                (alias, file_info)
+                for alias, file_info in image_info.items()
+                if (alias in filter_list)
+            )
+
         for alias, file_info in image_info_iter:
-            resize_data = resize_image(archive.extractfile(file_info)).items()
+            resize_data = resize_image(cls._extractfile(archive, file_info)).items()
             for resolution, image_buffer in resize_data:
                 image_entries.append(
                     Image(
                         article=article,
                         alias=alias,
-                        extension=os.path.splitext(file_info.name)[1].replace(',', ''),
+                        extension=os.path.splitext(file_info.name)[1].replace(".", ""),
                         resolution=resolution,
                         height=image_buffer.size[0],
                         width=image_buffer.size[1],
@@ -640,7 +671,7 @@ class PostUpdateHandler(object):
         return alias_imgattr_mapping
 
     @staticmethod
-    def _error_cleanup(image_entries: List[Image]) -> None:
+    def _error_cleanup(image_entries: Optional[List[Image]]) -> None:
         if image_entries:
             for entry in image_entries:
                 _LOGGER.warning(

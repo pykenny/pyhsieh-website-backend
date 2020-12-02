@@ -45,9 +45,10 @@ class RawArticleData(BaseModel):
 @final
 class ArticleEditHistory(BaseModel):
     """
-        Note: Recovery may be rarely used, so right now we're not adding other
-        indices to this table.
+    Note: Recovery may be rarely used, so right now we're not adding other
+    indices to this table.
     """
+
     article = models.ForeignKey(
         Article,
         on_delete=models.PROTECT,

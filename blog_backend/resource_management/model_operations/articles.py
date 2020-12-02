@@ -27,7 +27,7 @@ class ArticlePageListResult(NamedTuple):
 
 
 @final
-class ArticleOperations(BaseOperation):
+class ArticleOperations(BaseOperation[Article]):
     base_model = Article
 
     @classmethod
@@ -48,19 +48,28 @@ class ArticleOperations(BaseOperation):
     @classmethod
     def get_prev_and_next_article_synonyms(
         cls, article: Article
-    ) -> Tuple[Optional[Article], Optional[Article]]:
+    ) -> Tuple[Optional[str], Optional[str]]:
         prev_post = (
-            cls.base_model.objects.filter(id__lt=article.id).order_by("-id").values_list("synonym", flat=True).first()
+            cls.base_model.objects.filter(id__lt=article.id)
+            .order_by("-id")
+            .values_list("synonym", flat=True)
+            .first()
         )
         next_post = (
-            cls.base_model.objects.filter(id__gt=article.id).order_by("id").values_list("synonym", flat=True).first()
+            cls.base_model.objects.filter(id__gt=article.id)
+            .order_by("id")
+            .values_list("synonym", flat=True)
+            .first()
         )
 
         return prev_post, next_post
 
     @classmethod
     def get_article_page_list(
-        cls, page: int, page_size: int = 10, tag: Optional[str] = None,
+        cls,
+        page: int,
+        page_size: int = 10,
+        tag: Optional[str] = None,
         prefetch_for_blog: bool = False,
     ) -> ArticlePageListResult:
         """ It's strongly suggested to apply offset for this function. """
@@ -72,10 +81,10 @@ class ArticleOperations(BaseOperation):
         offset = (page - 1) * page_size
         article_list = cls.base_model.objects
         if tag:
-            article_list = article_list.filter(tags_of_article__tag_name=tag)
+            article_list = article_list.filter(article_tag__tag_name=tag)
         if prefetch_for_blog:
             article_list = article_list.prefetch_related("tags_of_article__tag")
-        article_list = article_list.order_by("-id")[offset: (offset + page_size + 1)]
+        article_list = article_list.order_by("-id")[offset : (offset + page_size + 1)]
         has_prev_page = len(article_list) == page_size + 1
 
         return ArticlePageListResult(
@@ -86,7 +95,7 @@ class ArticleOperations(BaseOperation):
 
 
 @final
-class RawArticleDataOperations(BaseOperation):
+class RawArticleDataOperations(BaseOperation[RawArticleData]):
     base_model = RawArticleData
 
     @classmethod
@@ -99,7 +108,7 @@ class RawArticleDataOperations(BaseOperation):
 
 
 @final
-class ArticleEditHistoryOperations(BaseOperation):
+class ArticleEditHistoryOperations(BaseOperation[ArticleEditHistory]):
     base_model = ArticleEditHistory
 
     @classmethod
@@ -107,12 +116,14 @@ class ArticleEditHistoryOperations(BaseOperation):
         return cls.base_model.objects.filter(article=article)
 
     @classmethod
-    def get_edit_histories_by_synonym(cls, synonym: str) -> QuerySet[ArticleEditHistory]:
-        return cls.base_model.objects.filter(article=synonym)
+    def get_edit_histories_by_synonym(
+        cls, synonym: str
+    ) -> QuerySet[ArticleEditHistory]:
+        return cls.base_model.objects.filter(article__synonym=synonym)
 
 
 @final
-class CompiledArticleDataOperations(BaseOperation):
+class CompiledArticleDataOperations(BaseOperation[CompiledArticleData]):
     base_model = CompiledArticleData
 
     @classmethod

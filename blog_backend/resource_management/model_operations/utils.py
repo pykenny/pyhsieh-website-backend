@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Iterable, List, Dict, Any, Generic, TypeVar
+from typing import Callable, Iterable, List, Dict, Any, Generic, Union, TypeVar
 
 from django.db import transaction
 from safedelete.models import SafeDeleteModel
@@ -7,13 +7,20 @@ from safedelete.models import SafeDeleteModel
 from resource_management.models.utils import BaseModel
 
 
-_T = TypeVar("_T", BaseModel, SafeDeleteModel)
+_T = TypeVar("_T", bound=Union[BaseModel, SafeDeleteModel])
+
+
+def mypy_safe_property(f: Callable[..., Any]) -> Any:
+    """Wrapper function on builtin property() to make mypy happy.
+    Ref: https://github.com/python/mypy/issues/1362#issuecomment-733877648
+    """
+    return property(f)
 
 
 class BaseOperation(Generic[_T], metaclass=ABCMeta):
-    @property
+    @mypy_safe_property
     @abstractmethod
-    def base_model(self) -> _T:
+    def base_model(self) -> Any:
         pass
 
     @classmethod
@@ -31,7 +38,7 @@ class BaseBulkOperation(Generic[_T], metaclass=ABCMeta):
     CREATE_BATCH_SIZE = 100
     UPDATE_BATCH_SIZE = 100
 
-    @property
+    @mypy_safe_property
     @abstractmethod
     def base_model(self) -> _T:
         pass
@@ -48,14 +55,11 @@ class BaseBulkOperation(Generic[_T], metaclass=ABCMeta):
     @classmethod
     @transaction.atomic
     def bulk_loose_create(cls, items: Iterable[Dict[str, Any]]) -> List[_T]:
-        """ Note: Django does not support PK filling when 'ignore_conflicts'
-            is enabled in bulk_create(). So we need to iterate through the
-            dicts and call get_or_create() for entries with PK.
+        """Note: Django does not support PK filling when 'ignore_conflicts'
+        is enabled in bulk_create(). So we need to iterate through the
+        dicts and call get_or_create() for entries with PK.
         """
-        return [
-            cls.base_model.objects.get_or_create(**item)[0]
-            for item in items
-        ]
+        return [cls.base_model.objects.get_or_create(**item)[0] for item in items]
 
     @classmethod
     def bulk_update(cls, items: Iterable[_T], fields: Iterable[str]) -> None:

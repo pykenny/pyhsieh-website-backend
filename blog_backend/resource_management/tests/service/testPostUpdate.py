@@ -113,9 +113,9 @@ class PostUpdateHandlerTestCase(TestCase):
         self.assertEqual(init_raw_timestamp, ver2_raw_timestamp)
         self.assertEqual(init_compile_timestamp, ver2_compile_timestamp)
         # - Will leave edit record
-        edit_history = ArticleEditHistory.objects.filter(
-            article=ver2_article
-        ).order_by("-created")
+        edit_history = ArticleEditHistory.objects.filter(article=ver2_article).order_by(
+            "-created"
+        )
         self.assertEqual(len(edit_history), 1)
         last_edit = edit_history.first()
         self.assertEqual(last_edit.previous_title, "Test Article")
@@ -141,9 +141,9 @@ class PostUpdateHandlerTestCase(TestCase):
         self.assertEqual(init_raw_timestamp, ver3_raw_timestamp)
         self.assertEqual(init_compile_timestamp, ver3_compile_timestamp)
         # - No edit record created
-        edit_history = ArticleEditHistory.objects.filter(
-            article=ver3_article
-        ).order_by("-created")
+        edit_history = ArticleEditHistory.objects.filter(article=ver3_article).order_by(
+            "-created"
+        )
         self.assertEqual(len(edit_history), 1)
         # - Check out article-tag relations
         ver3_tag_relations = (
@@ -174,9 +174,9 @@ class PostUpdateHandlerTestCase(TestCase):
         self.assertGreater(ver4_raw_timestamp, ver3_raw_timestamp)
         self.assertGreater(ver4_compile_timestamp, ver3_compile_timestamp)
         # - Will leave edit record
-        edit_history = ArticleEditHistory.objects.filter(
-            article=ver4_article
-        ).order_by("-created")
+        edit_history = ArticleEditHistory.objects.filter(article=ver4_article).order_by(
+            "-created"
+        )
         self.assertEqual(len(edit_history), 2)
         last_edit = edit_history.first()
         self.assertIsNone(last_edit.previous_title)
@@ -203,9 +203,9 @@ class PostUpdateHandlerTestCase(TestCase):
         self.assertGreater(ver5_raw_timestamp, ver4_raw_timestamp)
         self.assertGreater(ver5_compile_timestamp, ver4_compile_timestamp)
         # - Will leave edit record with file recompiled
-        edit_history = ArticleEditHistory.objects.filter(
-            article=ver5_article
-        ).order_by("-created")
+        edit_history = ArticleEditHistory.objects.filter(article=ver5_article).order_by(
+            "-created"
+        )
         self.assertEqual(len(edit_history), 3)
         last_edit = edit_history.first()
         self.assertIsNotNone(last_edit.previous_title)
@@ -226,7 +226,7 @@ class PostUpdateHandlerTestCase(TestCase):
         # - Simply check out number of image entries
         self.assertEqual(Image.objects.filter(article=ver5_article).count(), 10)
         self.assertEqual(Image.all_objects.filter(article=ver5_article).count(), 15)
-        
+
         # Version 6: Add/update images
         PostUpdateHandler.upload_article(
             path_join(TEST_FILE_ROOT_DIR, "TestData_06_image.tgz"),
@@ -245,9 +245,9 @@ class PostUpdateHandlerTestCase(TestCase):
         self.assertGreater(ver6_raw_timestamp, ver5_raw_timestamp)
         self.assertGreater(ver6_compile_timestamp, ver5_compile_timestamp)
         # - Will leave edit record with file recompiled
-        edit_history = ArticleEditHistory.objects.filter(
-            article=ver6_article
-        ).order_by("-created")
+        edit_history = ArticleEditHistory.objects.filter(article=ver6_article).order_by(
+            "-created"
+        )
         self.assertEqual(len(edit_history), 4)
         last_edit = edit_history.first()
         self.assertIsNone(last_edit.previous_title)
@@ -256,11 +256,15 @@ class PostUpdateHandlerTestCase(TestCase):
         self.assertIsNotNone(last_edit.recover_data)
         # - Simply check out number of image entries
         available_images = Image.objects.filter(article=ver6_article)
-        expected_aliases = {'drunk-cat', 'rabbit-carrot', 'red-fox'}
-        self.assertSetEqual(set(image.alias for image in available_images), expected_aliases)
+        expected_aliases = {"drunk-cat", "rabbit-carrot", "red-fox"}
+        self.assertSetEqual(
+            set(image.alias for image in available_images), expected_aliases
+        )
         removed_images = Image.deleted_objects.filter(article=ver6_article)
-        aliases_with_delete_history = {'drunk-cat', 'ikea-shark'}
-        self.assertSetEqual(set(image.alias for image in removed_images), aliases_with_delete_history)
+        aliases_with_delete_history = {"drunk-cat", "ikea-shark"}
+        self.assertSetEqual(
+            set(image.alias for image in removed_images), aliases_with_delete_history
+        )
         # Available entries = 3 * 5; Removed entries = 2 * 5
         self.assertEqual(Image.objects.filter(article=ver6_article).count(), 15)
         self.assertEqual(Image.deleted_objects.filter(article=ver6_article).count(), 10)
@@ -277,9 +281,7 @@ class PostUpdateHandlerTestCase(TestCase):
         article_timestamp = article.updated
         raw_data = RawArticleData.objects.get(article=article)
         raw_timestamp = raw_data.last_update
-        compile_timestamp = CompiledArticleData.objects.get(
-            article=article
-        ).last_update
+        compile_timestamp = CompiledArticleData.objects.get(article=article).last_update
 
         # Run again
         PostUpdateHandler.upload_article(
@@ -299,9 +301,9 @@ class PostUpdateHandlerTestCase(TestCase):
         self.assertEqual(raw_timestamp, raw_new_timestamp)
         self.assertEqual(compile_timestamp, compile_new_timestamp)
         # - Will leave edit record with file recompiled
-        edit_history = ArticleEditHistory.objects.filter(
-            article=article_new
-        ).order_by("-created")
+        edit_history = ArticleEditHistory.objects.filter(article=article_new).order_by(
+            "-created"
+        )
         self.assertFalse(edit_history)
 
     @use_test_image_dir

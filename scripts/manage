@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Wrapper for manage.py
+if [ $1 == "test_all" ]
+then
+  DEBUG=1 ./blog_backend/manage.py test --keepdb "${@:2}" ./blog_backend
+elif [ $1 == "test" ]
+then
+  DEBUG=1 ./blog_backend/manage.py test --keepdb "${@:2}"
+else
+  ./blog_backend/manage.py $@
+fi

@@ -6,4 +6,6 @@ aiohttp
 aiohttp_cors
 django-extensions
 jsonschema
+Werkzeug
+flake8
 

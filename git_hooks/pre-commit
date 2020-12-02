@@ -1,0 +1,22 @@
+#!/bin/bash
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+  against=HEAD
+else
+  against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+fi
+
+diff_files=$(git diff-index --name-only "$against")
+python_file_pattern='\.pyi\?$'
+python_files=$(grep "$python_file_pattern" <<< "$diff_files")
+
+# Blacken code
+python -m black -t py38 $python_files
+
+# Flake8
+python -m flake8 --max-line-length 119 --config "./blog_backend/.flake8" $python_files
+
+# MyPy (only works when in project root directory) (not working now)
+# project_python_files=$(cut -d '/' -f2- <<< "$diff_files")
+# pushd blog_backend && python -m mypy --config-file "./mypy.ini" $project_python_files || popd
+

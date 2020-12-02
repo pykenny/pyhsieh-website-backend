@@ -13,9 +13,7 @@ class Command(BaseCommand):
     )
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "archive-path", type=str, help="Path to tar bundle file."
-        )
+        parser.add_argument("archive-path", type=str, help="Path to tar bundle file.")
         parser.add_argument(
             "--synonym",
             dest="synonym",

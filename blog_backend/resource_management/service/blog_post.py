@@ -17,11 +17,15 @@ __all__ = [
 DATE_FORMAT: Final = "%Y%m%d-%H%m%S"
 
 
-def get_posts_by_page(page: int, page_size: int, tag: Optional[str] = None) -> Dict[str, Any]:
+def get_posts_by_page(
+    page: int, page_size: int, tag: Optional[str] = None
+) -> Dict[str, Any]:
     """Provide title, alias, time, and tags. Ordered by time in desc order.
     Also, points out whether the previous or next page exists.
     """
-    search_result = ArticleOperations.get_article_page_list(page, page_size, tag=tag, prefetch_for_blog=True)
+    search_result = ArticleOperations.get_article_page_list(
+        page, page_size, tag=tag, prefetch_for_blog=True
+    )
     posts = [
         {
             "title": article_entry.title,
@@ -44,8 +48,12 @@ def get_posts_by_page(page: int, page_size: int, tag: Optional[str] = None) -> D
 
 def get_post_data(synonym: str) -> Dict[str, Any]:
     """ Provide post title, XML based on article alias """
-    post_entry = ArticleOperations.get_article_by_synonym(synonym, prefetch_for_blog=True)
-    prev_post, next_post = ArticleOperations.get_prev_and_next_article_synonyms(post_entry)
+    post_entry = ArticleOperations.get_article_by_synonym(
+        synonym, prefetch_for_blog=True
+    )
+    prev_post, next_post = ArticleOperations.get_prev_and_next_article_synonyms(
+        post_entry
+    )
     raw_xml = CompiledArticleDataOperations.get_compiled_data(post_entry).data
     return {
         "title": post_entry.title,

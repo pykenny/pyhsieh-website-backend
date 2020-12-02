@@ -44,7 +44,7 @@ class ImgSrcNotProvidedError(Exception):
 
 def resize_image(
     fp: IO[bytes],
-) -> OrderedDict[Image.ImageResolutionType, PILImage.Image]:
+) -> "OrderedDict[Image.ImageResolutionType, PILImage.Image]":
     """Resize image as much as it can and return mapping between
     resolution Enum and processed image.
 

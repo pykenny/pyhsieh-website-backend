@@ -157,7 +157,7 @@ class PostUpdateHandler(object):
     @classmethod
     def _extractfile(cls, archive: TarFile, file_info: TarInfo) -> IO[bytes]:
         """ Wrapper on TarFile.extractfile() to guarantee IO handle is returned. """
-        stream = cls._extractfile(archive, file_info)
+        stream = archive.extractfile(file_info)
         if not stream:
             raise ValueError("file_info does not reference to regular file or link.")
 

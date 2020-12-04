@@ -7,5 +7,5 @@ from .utils import json_404_on_error
 
 @require_GET
 @json_404_on_error
-def get_full_file_path(_, filename):
-    return JsonResponse(image_service.get_full_file_path(filename))
+def get_full_file_path(_, file_name):
+    return JsonResponse(image_service.get_full_file_path(file_name))

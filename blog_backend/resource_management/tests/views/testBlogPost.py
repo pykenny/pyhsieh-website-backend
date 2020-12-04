@@ -3,7 +3,6 @@ from random import sample
 from typing import NamedTuple
 
 from django.test import TestCase
-from django.utils.encoding import force_str
 
 from jsonschema import validate
 
@@ -22,10 +21,10 @@ from resource_management.views.constants import (
 )
 from resource_management.tests.test_utils import TEST_FILE_ROOT_DIR
 from .constants import (
-    SCHEMA_POSTS_BY_PAGE,
-    SCHEMA_POSTS_BY_PAGE_AND_TAG,
-    SCHEMA_GET_POST_DATA,
-    SCHEMA_GET_TAG_LIST,
+    SCHEMA_BLOG_POST_POSTS_BY_PAGE,
+    SCHEMA_BLOG_POST_POSTS_BY_PAGE_AND_TAG,
+    SCHEMA_BLOG_POST_GET_POST_DATA,
+    SCHEMA_BLOG_POST_GET_TAG_LIST,
     DATETIME_STR_FORMAT,
 )
 
@@ -120,7 +119,7 @@ class ViewBlogPostTestCase(TestCase):
         }
         self.assertEqual(response.status_code, SUCCESS_CODE)
         response_json = response.json()
-        validate(response_json, SCHEMA_POSTS_BY_PAGE)
+        validate(response_json, SCHEMA_BLOG_POST_POSTS_BY_PAGE)
         self.assertDictEqual(response_json, expected)
 
     def test_posts_by_page_mid_page(self):
@@ -135,7 +134,7 @@ class ViewBlogPostTestCase(TestCase):
         }
         self.assertEqual(response.status_code, SUCCESS_CODE)
         response_json = response.json()
-        validate(response_json, SCHEMA_POSTS_BY_PAGE)
+        validate(response_json, SCHEMA_BLOG_POST_POSTS_BY_PAGE)
         self.assertDictEqual(response_json, expected)
 
     def test_posts_by_page_end(self):
@@ -150,17 +149,16 @@ class ViewBlogPostTestCase(TestCase):
         }
         self.assertEqual(response.status_code, SUCCESS_CODE)
         response_json = response.json()
-        validate(response_json, SCHEMA_POSTS_BY_PAGE)
+        validate(response_json, SCHEMA_BLOG_POST_POSTS_BY_PAGE)
         self.assertDictEqual(response_json, expected)
 
     def test_posts_by_page_out_of_range(self):
         invalid_page_nums = (0, 100)
         for page_num in invalid_page_nums:
             response = self.client.get("/resource/posts_by_page/{0:d}".format(page_num))
+            response_json = response.json()
             self.assertEqual(response.status_code, RESOURCE_NOT_FOUND_STATUS_CODE)
-            self.assertJSONEqual(
-                force_str(response.content), RESOURCE_NOT_FOUND_JSON_DATA
-            )
+            self.assertDictEqual(response_json, RESOURCE_NOT_FOUND_JSON_DATA)
 
     def _call_posts_by_page_and_tag_with_valid_args(self, page_num, tag_name):
         articles_data = (
@@ -200,7 +198,7 @@ class ViewBlogPostTestCase(TestCase):
 
         self.assertEqual(response.status_code, SUCCESS_CODE)
         response_json = response.json()
-        validate(response_json, SCHEMA_POSTS_BY_PAGE_AND_TAG)
+        validate(response_json, SCHEMA_BLOG_POST_POSTS_BY_PAGE_AND_TAG)
         self.assertDictEqual(response_json, expected)
 
     def test_posts_by_page_and_tag_mid(self):
@@ -219,7 +217,7 @@ class ViewBlogPostTestCase(TestCase):
 
         self.assertEqual(response.status_code, SUCCESS_CODE)
         response_json = response.json()
-        validate(response_json, SCHEMA_POSTS_BY_PAGE_AND_TAG)
+        validate(response_json, SCHEMA_BLOG_POST_POSTS_BY_PAGE_AND_TAG)
         self.assertDictEqual(response_json, expected)
 
     def test_posts_by_page_and_tag_last(self):
@@ -238,7 +236,7 @@ class ViewBlogPostTestCase(TestCase):
 
         self.assertEqual(response.status_code, SUCCESS_CODE)
         response_json = response.json()
-        validate(response_json, SCHEMA_POSTS_BY_PAGE_AND_TAG)
+        validate(response_json, SCHEMA_BLOG_POST_POSTS_BY_PAGE_AND_TAG)
         self.assertDictEqual(response_json, expected)
 
     def test_posts_by_page_and_tag_out_of_bound(self):
@@ -248,10 +246,9 @@ class ViewBlogPostTestCase(TestCase):
             response = self.client.get(
                 "/resource/posts_by_page_and_tag/{0:s}/{1:d}".format(tag_name, page_num)
             )
+            response_json = response.json()
             self.assertEqual(response.status_code, RESOURCE_NOT_FOUND_STATUS_CODE)
-            self.assertJSONEqual(
-                force_str(response.content), RESOURCE_NOT_FOUND_JSON_DATA
-            )
+            self.assertDictEqual(response_json, RESOURCE_NOT_FOUND_JSON_DATA)
 
     def test_get_post_data_mid(self):
         selected_article_id = 100
@@ -277,7 +274,7 @@ class ViewBlogPostTestCase(TestCase):
 
         self.assertEqual(response.status_code, SUCCESS_CODE)
         response_json = response.json()
-        validate(response_json, SCHEMA_GET_POST_DATA)
+        validate(response_json, SCHEMA_BLOG_POST_GET_POST_DATA)
         self.assertDictEqual(response_json, expected)
 
     def test_get_post_data_latest(self):
@@ -302,7 +299,7 @@ class ViewBlogPostTestCase(TestCase):
 
         self.assertEqual(response.status_code, SUCCESS_CODE)
         response_json = response.json()
-        validate(response_json, SCHEMA_GET_POST_DATA)
+        validate(response_json, SCHEMA_BLOG_POST_GET_POST_DATA)
         self.assertDictEqual(response_json, expected)
 
     def test_get_post_data_oldest(self):
@@ -327,19 +324,21 @@ class ViewBlogPostTestCase(TestCase):
 
         self.assertEqual(response.status_code, SUCCESS_CODE)
         response_json = response.json()
-        validate(response_json, SCHEMA_GET_POST_DATA)
+        validate(response_json, SCHEMA_BLOG_POST_GET_POST_DATA)
         self.assertDictEqual(response_json, expected)
 
     def test_get_post_data_not_exist(self):
         response = self.client.get("/resource/get_post_data/non-exist-article")
+        response_json = response.json()
         self.assertEqual(response.status_code, RESOURCE_NOT_FOUND_STATUS_CODE)
-        self.assertJSONEqual(force_str(response.content), RESOURCE_NOT_FOUND_JSON_DATA)
+        self.assertDictEqual(response_json, RESOURCE_NOT_FOUND_JSON_DATA)
 
     def test_get_tag_list(self):
         response = self.client.get("/resource/get_tag_list/")
+        response_json = response.json()
         expected = {
             "data": self.sorted_tags_full,
         }
         self.assertEqual(response.status_code, SUCCESS_CODE)
-        validate(response.json(), SCHEMA_GET_TAG_LIST)
-        self.assertJSONEqual(force_str(response.content), expected)
+        validate(response.json(), SCHEMA_BLOG_POST_GET_TAG_LIST)
+        self.assertDictEqual(response_json, expected)

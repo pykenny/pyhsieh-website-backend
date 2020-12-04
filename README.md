@@ -10,14 +10,15 @@ Repository for maintaining personal website's backend.
    unit tests, then you'll need to create another database, and grant full access to the same user.
 
 ### Pip Package Dependencies
- - Package dependencies and installation are managed by [`pip-tools`](https://github.com/jazzband/pip-tools).
-   You can directly run `make init-dev` or `make init-prod` to get them done at once, depends on the environment.
-    - You may get errors which failed to link external libraries (for instance, `psycopg2`). While some of them can be
-      solved by installing the package globally, try finding link/include directory path, then pass `LDFLAGS`,
-      `CPPFLAGS`, or `CFLAGS` as environment variables before the command.
-      ```
-      LDFLAGS="..." CPPFLAGS="..." make init-dev
-      ```
+Package dependencies and installation are managed by [`pip-tools`](https://github.com/jazzband/pip-tools).
+You can directly run `make init-dev` or `make init-prod` to get them done at once, depends on the environment.
+
+You may get errors which failed to link external libraries (for instance, `psycopg2`). While some of them can be solved
+by installing the package globally, try finding link/include directory path, then pass `LDFLAGS`, `CPPFLAGS`, or
+`CFLAGS` as environment variables before the command.
+```
+LDFLAGS="..." CPPFLAGS="..." make init-dev
+```
 
 Some of the dev-environment dependencies are optional, and you may want to add up some additional dependencies.
 Package dependencies are listed in `requirements/dev.in` and `requirements/prod.in`. You can modify the lists,
@@ -95,8 +96,8 @@ This application uses [`black`](https://github.com/psf/black), [`flake8`](https:
 [`mypy`](http://mypy-lang.org/) to enforce code styling and type notation.
 
 A pre-commit git hook can be found in `git_hooks/pre-commit` and you can clone it by running
-`make clone-pre-commit-hook` to `.git/hooks/`. This will run `black` and `flake8` on modified Python files before
-commits.
+`make clone-pre-commit-hook` to `.git/hooks/`. This will run all the tools on added/modified Python files before
+commits, and stop the process if any of them reports error.
 
 If you want to run these tools on the whole repository, run `make black-all`,
 `make flake8-all`, or `make mypy-all` under repository root.

@@ -1,7 +1,7 @@
 ##########################
 #  JSON Response Schema  #
 ##########################
-SCHEMA_POSTS_BY_PAGE = {
+SCHEMA_BLOG_POST_POSTS_BY_PAGE = {
     "type": "object",
     "properties": {
         "page_num": {"type": "integer", "minimum": 1},
@@ -28,9 +28,9 @@ SCHEMA_POSTS_BY_PAGE = {
     "required": ["page_num", "has_next_page", "has_prev_page", "posts"],
 }
 
-SCHEMA_POSTS_BY_PAGE_AND_TAG = SCHEMA_POSTS_BY_PAGE
+SCHEMA_BLOG_POST_POSTS_BY_PAGE_AND_TAG = SCHEMA_BLOG_POST_POSTS_BY_PAGE
 
-SCHEMA_GET_POST_DATA = {
+SCHEMA_BLOG_POST_GET_POST_DATA = {
     "type": "object",
     "properties": {
         "title": {"type": "string"},
@@ -43,7 +43,7 @@ SCHEMA_GET_POST_DATA = {
     "required": ["title", "created", "content", "tags", "synonym_prev", "synonym_next"],
 }
 
-SCHEMA_GET_TAG_LIST = {
+SCHEMA_BLOG_POST_GET_TAG_LIST = {
     "type": "object",
     "properties": {
         "data": {
@@ -51,6 +51,14 @@ SCHEMA_GET_TAG_LIST = {
             "items": {"type": "string"},
             "uniqueItems": True,
         }
+    },
+    "required": ["data"],
+}
+
+SCHEMA_IMAGES_GET_FULL_FILE_PATH = {
+    "type": "object",
+    "properties": {
+        "data": {"type": "string"},
     },
     "required": ["data"],
 }

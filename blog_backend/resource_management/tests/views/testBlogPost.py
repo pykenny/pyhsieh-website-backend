@@ -97,7 +97,7 @@ class ViewBlogPostTestCase(TestCase):
             {
                 "title": article_data.article.title,
                 "synonym": article_data.article.synonym,
-                "created": article_data.article.created.strftime(DATETIME_STR_FORMAT),
+                "timestamp": article_data.article.created.strftime(DATETIME_STR_FORMAT),
                 "tags": self.sorted_tags_full
                 if has_tag_3
                 else self.sorted_tags_partial,
@@ -171,7 +171,7 @@ class ViewBlogPostTestCase(TestCase):
             {
                 "title": article_data.article.title,
                 "synonym": article_data.article.synonym,
-                "created": article_data.article.created.strftime(DATETIME_STR_FORMAT),
+                "timestamp": article_data.article.created.strftime(DATETIME_STR_FORMAT),
                 "tags": self.sorted_tags_full,
             }
             for article_data in articles_data
@@ -256,7 +256,7 @@ class ViewBlogPostTestCase(TestCase):
         article_data = self.article_list[selected_article_index]
         expected = {
             "title": article_data.article.title,
-            "created": article_data.article.created.strftime(DATETIME_STR_FORMAT),
+            "timestamp": article_data.article.created.strftime(DATETIME_STR_FORMAT),
             "content": article_data.compiled_data.data,
             "tags": self.sorted_tags_full
             if selected_article_id in self.tag3_article_ids
@@ -283,7 +283,7 @@ class ViewBlogPostTestCase(TestCase):
         article_data = self.article_list[selected_article_index]
         expected = {
             "title": article_data.article.title,
-            "created": article_data.article.created.strftime(DATETIME_STR_FORMAT),
+            "timestamp": article_data.article.created.strftime(DATETIME_STR_FORMAT),
             "content": article_data.compiled_data.data,
             "tags": self.sorted_tags_full
             if selected_article_id in self.tag3_article_ids
@@ -308,7 +308,7 @@ class ViewBlogPostTestCase(TestCase):
         article_data = self.article_list[selected_article_index]
         expected = {
             "title": article_data.article.title,
-            "created": article_data.article.created.strftime(DATETIME_STR_FORMAT),
+            "timestamp": article_data.article.created.strftime(DATETIME_STR_FORMAT),
             "content": article_data.compiled_data.data,
             "tags": self.sorted_tags_full
             if selected_article_id in self.tag3_article_ids

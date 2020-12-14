@@ -8,7 +8,7 @@ fi
 
 diff_files=$(git diff-index --diff-filter=ACM --name-only "$against")
 python_file_pattern='\.pyi\?$'
-python_files=$(grep $python_file_pattern <<< $diff_files)
+python_files=$(grep $python_file_pattern <<< "$diff_files")
 
 # Blacken code
 python -m black -t py38 $python_files
@@ -19,9 +19,8 @@ python -m flake8 --max-line-length 119 --config "./blog_backend/.flake8" $python
 flake8_code=$?
 
 # MyPy (only works when in project root directory)
-project_python_files=$(cut -d '/' -f2- <<< $python_files)
+project_python_files=$( cut -d '/' -f2- <<< "$python_files" )
 
-# MyPy quirks when not receiving any argument, so skip it when no file's found.
 if [[ "$project_python_files" == *[![:space:]]* ]]
 then
   pushd blog_backend && {

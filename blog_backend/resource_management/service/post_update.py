@@ -607,8 +607,8 @@ class PostUpdateHandler(object):
                         alias=alias,
                         extension=os.path.splitext(file_info.name)[1].replace(".", ""),
                         resolution=resolution,
-                        height=image_buffer.size[0],
-                        width=image_buffer.size[1],
+                        width=image_buffer.size[0],
+                        height=image_buffer.size[1],
                     )
                 )
                 image_buffers.append(image_buffer)

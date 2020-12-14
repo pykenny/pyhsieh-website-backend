@@ -15,13 +15,13 @@ SCHEMA_BLOG_POST_POSTS_BY_PAGE = {
                 "properties": {
                     "title": {"type": "string"},
                     "synonym": {"type": "string"},
-                    "created": {"type": "string"},
+                    "timestamp": {"type": "string"},
                     "tags": {
                         "type": "array",
                         "items": {"type": "string", "uniqueItems": True},
                     },
                 },
-                "required": ["title", "synonym", "created", "tags"],
+                "required": ["title", "synonym", "timestamp", "tags"],
             },
         },
     },
@@ -34,13 +34,20 @@ SCHEMA_BLOG_POST_GET_POST_DATA = {
     "type": "object",
     "properties": {
         "title": {"type": "string"},
-        "created": {"type": "string"},
+        "timestamp": {"type": "string"},
         "content": {"type": "string"},
         "tags": {"type": "array", "items": {"type": "string"}, "uniqueItems": True},
         "synonym_prev": {"type": ["string", "null"]},
         "synonym_next": {"type": ["string", "null"]},
     },
-    "required": ["title", "created", "content", "tags", "synonym_prev", "synonym_next"],
+    "required": [
+        "title",
+        "timestamp",
+        "content",
+        "tags",
+        "synonym_prev",
+        "synonym_next",
+    ],
 }
 
 SCHEMA_BLOG_POST_GET_TAG_LIST = {

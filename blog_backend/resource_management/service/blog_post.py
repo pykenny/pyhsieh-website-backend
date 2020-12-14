@@ -28,7 +28,7 @@ def get_posts_by_page(
         {
             "title": article_entry.title,
             "synonym": article_entry.synonym,
-            "created": article_entry.created.strftime(DATE_FORMAT),
+            "timestamp": article_entry.created.strftime(DATE_FORMAT),
             "tags": [
                 tag_entry.tag_name
                 for tag_entry in TagOperations.get_tags_from_article(article_entry)
@@ -57,7 +57,7 @@ def get_post_data(synonym: str) -> Dict[str, Any]:
     raw_xml = CompiledArticleDataOperations.get_compiled_data(post_entry).data
     return {
         "title": post_entry.title,
-        "created": post_entry.created.strftime(DATE_FORMAT),
+        "timestamp": post_entry.created.strftime(DATE_FORMAT),
         "content": raw_xml,
         "tags": [
             tag_entry.tag_name

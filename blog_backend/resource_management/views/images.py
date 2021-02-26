@@ -1,11 +1,11 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
-from resource_management.service.image import (
-    get_full_file_path as get_full_file_path_service,
-)
+import resource_management.service.image as image_service
+from .utils import json_404_on_error
 
 
 @require_GET
-def get_full_file_path(_, filename):
-    return JsonResponse(get_full_file_path_service(filename))
+@json_404_on_error
+def get_full_file_path(_, file_name):
+    return JsonResponse(image_service.get_full_file_path(file_name))

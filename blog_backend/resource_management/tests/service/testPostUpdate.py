@@ -4,7 +4,7 @@ from os.path import join as path_join
 from django.test import TestCase
 from django.conf import settings
 
-from resource_management.tests.utils import use_test_image_dir, TEST_FILE_ROOT_DIR
+from resource_management.tests.test_utils import use_test_image_dir, TEST_FILE_ROOT_DIR
 from resource_management.service.post_update import PostUpdateHandler
 from resource_management.models import (
     Article,
@@ -18,9 +18,6 @@ from resource_management.models import (
 
 
 class PostUpdateHandlerTestCase(TestCase):
-    def setUp(self):
-        pass
-
     @use_test_image_dir
     def test_upload_article_create(self):
         synonyms = ("test-article-01", "test-article-02", "test-article-03")

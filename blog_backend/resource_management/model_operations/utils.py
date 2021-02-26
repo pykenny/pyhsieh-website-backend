@@ -20,7 +20,7 @@ def mypy_safe_property(f: Callable[..., Any]) -> Any:
 class BaseOperation(Generic[_T], metaclass=ABCMeta):
     @mypy_safe_property
     @abstractmethod
-    def base_model(self) -> Any:
+    def base_model(self) -> _T:
         pass
 
     @classmethod

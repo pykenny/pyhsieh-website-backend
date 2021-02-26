@@ -1,6 +1,7 @@
 from typing import NamedTuple, Tuple, Optional, final
 
 from django.db.models.query import QuerySet
+from django.core.exceptions import ObjectDoesNotExist
 
 from resource_management.models import (
     Article,
@@ -81,14 +82,17 @@ class ArticleOperations(BaseOperation[Article]):
         offset = (page - 1) * page_size
         article_list = cls.base_model.objects
         if tag:
-            article_list = article_list.filter(article_tag__tag_name=tag)
+            article_list = article_list.filter(article_tag__tag__tag_name=tag)
+        # TODO: We need a better way to prefetch tags (sorted lexicographically)
         if prefetch_for_blog:
             article_list = article_list.prefetch_related("tags_of_article__tag")
         article_list = article_list.order_by("-id")[offset : (offset + page_size + 1)]
+        if not article_list:
+            raise ObjectDoesNotExist()
         has_prev_page = len(article_list) == page_size + 1
 
         return ArticlePageListResult(
-            article_list=article_list,
+            article_list=article_list[:page_size],
             has_prev_page=has_prev_page,
             has_next_page=has_next_page,
         )

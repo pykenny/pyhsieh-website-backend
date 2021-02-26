@@ -9,17 +9,24 @@ update-deps:
 	pip-compile --upgrade --build-isolation --generate-hashes --output-file requirements/prod.txt requirements/prod.in
 	pip-compile --upgrade --build-isolation --generate-hashes --output-file requirements/dev.txt requirements/dev.in
 
-init-dev:
+sync-dev:
 	pip-sync requirements/prod.txt requirements/dev.txt
 	rm -rf .tox
 
-init-prod:
+sync-prod:
 	pip-sync requirements/prod.txt
 	rm -rf .tox
 
-update-dev: update-deps init-dev
+init-deps:
+	pip install pip-tools setuptools
 
-update-prod: update-deps init-prod
+init-dev: init-dep sync-dev
+
+init-prod: init-dep sync-prod
+
+update-dev: update-deps sync-dev
+
+update-prod: update-deps sync-prod
 
 black-all:
 	python -m black -t py38 "./blog_backend"
@@ -31,4 +38,4 @@ flake8-all:
 mypy-all:
 	pushd blog_backend && python -m mypy --config-file "./mypy.ini" "." || popd
 
-.PHONY: clone-pre-commit-hook update-deps init-dev init-prod update-dev update-prod black-all flake8-all mypy-all
+.PHONY: clone-pre-commit-hook update-deps init-deps init-dev init-prod sync-dev sync-prod update-dev update-prod black-all flake8-all mypy-all

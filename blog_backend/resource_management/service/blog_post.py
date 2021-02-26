@@ -6,8 +6,6 @@ from resource_management.model_operations import (
     TagOperations,
 )
 
-# TODOs: Should I "ring the bell" in view functions?
-
 __all__ = [
     "get_posts_by_page",
     "get_post_data",
@@ -30,16 +28,18 @@ def get_posts_by_page(
         {
             "title": article_entry.title,
             "synonym": article_entry.synonym,
-            "created": article_entry.created.strftime(DATE_FORMAT),
+            "timestamp": article_entry.created.strftime(DATE_FORMAT),
             "tags": [
-                tag_rel_entry.tag.tag_name
-                for tag_rel_entry in article_entry.tags_of_article.all()
+                tag_entry.tag_name
+                for tag_entry in TagOperations.get_tags_from_article(article_entry)
             ],
         }
         for article_entry in search_result.article_list
     ]
 
     return {
+        "page_num": page,
+        "tag": tag,
         "has_next_page": search_result.has_next_page,
         "has_prev_page": search_result.has_prev_page,
         "posts": posts,
@@ -57,7 +57,7 @@ def get_post_data(synonym: str) -> Dict[str, Any]:
     raw_xml = CompiledArticleDataOperations.get_compiled_data(post_entry).data
     return {
         "title": post_entry.title,
-        "created": post_entry.created.strftime(DATE_FORMAT),
+        "timestamp": post_entry.created.strftime(DATE_FORMAT),
         "content": raw_xml,
         "tags": [
             tag_entry.tag_name

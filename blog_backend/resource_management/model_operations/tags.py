@@ -27,12 +27,24 @@ class TagOperations(BaseOperation[Tag], BaseBulkOperation[Tag]):
         return cls.base_model.objects.get(tag_name=tag_name)
 
     @classmethod
-    def get_tags_from_article(cls, article: Article) -> QuerySet[Tag]:
-        return cls.base_model.objects.filter(article_tag__article=article)
+    def get_tags_from_article(
+        cls, article: Article, sorted: bool = True
+    ) -> QuerySet[Tag]:
+        query = cls.base_model.objects.filter(article_tag__article=article)
+        if sorted:
+            query = query.order_by("tag_name")
+
+        return query
 
     @classmethod
-    def get_tags_from_article_synonym(cls, synonym: str) -> QuerySet[Tag]:
-        return cls.base_model.objects.filter(article_tag__article__synonym=synonym)
+    def get_tags_from_article_synonym(
+        cls, synonym: str, sorted: bool = True
+    ) -> QuerySet[Tag]:
+        query = cls.base_model.objects.filter(article_tag__article__synonym=synonym)
+        if sorted:
+            query = query.order_by("tag_name")
+
+        return query
 
     @classmethod
     def get_all_tags(cls) -> Iterable[str]:

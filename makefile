@@ -20,9 +20,9 @@ sync-prod:
 init-deps:
 	pip install pip-tools setuptools
 
-init-dev: init-dep sync-dev
+init-dev: init-deps sync-dev
 
-init-prod: init-dep sync-prod
+init-prod: init-deps sync-prod
 
 update-dev: update-deps sync-dev
 

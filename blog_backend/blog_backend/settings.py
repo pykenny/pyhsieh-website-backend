@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from os import environ
+from os.path import join as path_join
 from pathlib import Path
+from copy import deepcopy
 
+from django.utils.log import DEFAULT_LOGGING
 from django.core.exceptions import ImproperlyConfigured
 
 import dotenv
@@ -84,7 +87,6 @@ WSGI_APPLICATION = "blog_backend.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -99,6 +101,7 @@ DATABASES = {
     }
 }
 
+# Only enable test DB in debug/dev settings
 if DEBUG:
     DATABASES["default"]["TEST"]["NAME"] = get_env_value("DB_TEST_NAME")
 
@@ -135,3 +138,39 @@ if DEBUG:
     PROTECTED_IMAGE_GROUP_TEST = get_env_value("PROTECTED_IMAGE_GROUP_TEST")
     OPENED_IMAGE_DIR_TEST = get_env_value("OPENED_IMAGE_DIR_TEST")
     PROTECTED_IMAGE_DIR_TEST = get_env_value("PROTECTED_IMAGE_DIR_TEST")
+
+# Disable mailing on critical events
+# Recipe: https://lincolnloop.com/blog/disabling-error-emails-django/
+logging_dict = deepcopy(DEFAULT_LOGGING)
+logging_dict['loggers']['django']['handlers'] = ['console']
+# logging_dict
+
+# Modified from this source:
+# https://djangodeployment.readthedocs.io/en/latest/07-settings.html#logging
+# TODO: Customize it with better representation
+if not DEBUG:
+    LOG_DIR = get_env_value("LOG_DIR")
+    LOG_BASE_NAME = get_env_value("LOG_BASE_NAME")
+    logging_dict['formatters']['default'] = {'format': '[%(asctime)s] %(levelname)s: %(message)s'}
+    logging_dict['handlers']['file'] = {
+        'class': 'logging.handlers.'
+                 'TimedRotatingFileHandler',
+        'filename': path_join(LOG_DIR, '{base:s}{suffix:s}'.format(base=LOG_BASE_NAME, suffix='.log')),
+        'when': 'midnight',
+        'backupCount': 60,
+        'formatter': 'default',
+    }
+    logging_dict['root'] = {'handlers': ['file'], 'level': 'INFO'}
+
+# Cache
+if not DEBUG:
+    cache_dir = get_env_value('CACHE_DIR')
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.filebased.'
+                       'FileBasedCache',
+            'LOCATION': cache_dir,
+        }
+    }
+
+LOGGING = logging_dict

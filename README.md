@@ -76,6 +76,11 @@ DB_PASSWORD="DB User Password"
 DB_HOST="Host Address or Socket Directory"
 DB_PORT="DB Port"
 
+LOG_DIR="Directory for storing log files (prod mode)"
+LOG_BASE_NAME="Base name for log files (prod mode)"
+
+CACHE_DIR="Directory for file-based cache (prod mode)"
+
 ALLOWED_HOSTS="Comma-separated List. e.g.: localhost,127.0.0.1,www.mysite.com"
 ```
 

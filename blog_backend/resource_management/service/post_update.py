@@ -2,7 +2,6 @@ import os
 import os.path
 from collections import ItemsView
 from pathlib import Path
-import logging
 from itertools import groupby, chain
 from json import (
     load as json_load,
@@ -98,10 +97,6 @@ _SRCSET_FORMAT: Final = "{img_route:s}{{file_name:s}} {{width:d}}w".format(
     img_route=_IMG_URL_ROUTE,
 )
 
-# LOGGING
-logging.basicConfig(level=logging.NOTSET)
-_LOGGER = logging.getLogger()
-
 
 @final
 class ValidatedDocument(NamedTuple):
@@ -120,10 +115,10 @@ class PostUpdateHandler(object):
     def upload_article(
         cls, bundle: str, doc_synonym: str, create_only: bool = False
     ) -> None:
-        _LOGGER.info("Reading target archive file...")
+        print("Reading target archive file...")
         with tarfile.open(bundle, "r:gz") as archive:
             # Step 1: Validate archive and create parsed data (JSON, XML, ...)
-            _LOGGER.info("Validating archive...")
+            print("Validating archive...")
             validated_doc = cls._validate_archive(archive)
             # Step 2: Is this a new article, or existing one?
             update_flag = True
@@ -142,13 +137,13 @@ class PostUpdateHandler(object):
                             synonym=doc_synonym
                         )
                     )
-                _LOGGER.info(
+                print(
                     "Synonym '{synonym:s}' has been registered. "
                     "Try to update existing entry...".format(synonym=doc_synonym)
                 )
                 cls._update_article(target_article, validated_doc, archive)
             else:
-                _LOGGER.info(
+                print(
                     "Synonym '{synonym:s}' has not been registered. "
                     "Start creating new article entry...".format(synonym=doc_synonym)
                 )
@@ -226,7 +221,7 @@ class PostUpdateHandler(object):
 
         # Update Article entry as needed (title)
         if target_article.title != validated_doc.title:
-            _LOGGER.info(
+            print(
                 "Title Changed: {old_title:s} -> {new_title:s}".format(
                     old_title=target_article.title, new_title=validated_doc.title
                 )
@@ -237,13 +232,13 @@ class PostUpdateHandler(object):
         # Update raw document entry as needed (version / raw data)
         raw_document = RawArticleDataOperations.get_raw_data(target_article)
         if raw_document.data != validated_doc.raw_document:
-            _LOGGER.info("Detect modification on raw Markdown file. Creating patch...")
+            print("Detect modification on raw Markdown file. Creating patch...")
             edit_patches = DocumentPatchCreator().create_patch_files(
                 validated_doc.raw_document, validated_doc.raw_document
             )
             raw_document.data = validated_doc.raw_document
         if raw_document.version != validated_doc.version:
-            _LOGGER.info(
+            print(
                 "Version Changed: {old_version:s} -> {new_version:s}".format(
                     old_version=raw_document.version, new_version=validated_doc.version
                 )
@@ -253,7 +248,7 @@ class PostUpdateHandler(object):
 
         # Create edit history as needed
         if original_title or edit_patches or original_version:
-            _LOGGER.info("... New edit entry required.")
+            print("... New edit entry required.")
             edit_history_entry = ArticleEditHistory(
                 previous_title=original_title,
                 previous_version=original_version,
@@ -277,14 +272,14 @@ class PostUpdateHandler(object):
                 ) as updated_image_stream:
                     if not image_compare(updated_image_stream, original_image_path):
                         renewed_images.add(entry.alias)
-                        _LOGGER.info(
+                        print(
                             "Detect image changed: {alias:s}".format(alias=entry.alias)
                         )
                     else:
                         updated_images.remove(entry.alias)
             else:
                 removed_images.add(entry.alias)
-                _LOGGER.info(
+                print(
                     "Detect image removed: {alias:s}".format(alias=entry.alias)
                 )
 
@@ -334,7 +329,7 @@ class PostUpdateHandler(object):
             entry.tag.tag_name for entry in removed_tag_relations
         )
         created_tags: Set[str] = set(validated_doc.tags) - kept_tags - removed_tags
-        _LOGGER.info(
+        print(
             "Kept tags: {0:s}\nRemoved tags: {1:s}\nCreated tags: {2:s}".format(
                 ", ".join(kept_tags), ", ".join(removed_tags), ", ".join(created_tags)
             )
@@ -376,7 +371,7 @@ class PostUpdateHandler(object):
                     archive,
                 )
             if not update_flag:
-                _LOGGER.info("No required update detected.")
+                print("No required update detected.")
             write_success_flag = True
         finally:
             if not write_success_flag:
@@ -396,10 +391,10 @@ class PostUpdateHandler(object):
             data=validated_doc.raw_document,
         )
         tags_updated = validated_doc.tags
-        _LOGGER.info(
+        print(
             "Article tags: {tag_list:s} .".format(tag_list=", ".join(tags_updated))
         )
-        _LOGGER.info(
+        print(
             "Loading data of {num_images:d} images...".format(
                 num_images=len(validated_doc.image_info)
             )
@@ -410,7 +405,7 @@ class PostUpdateHandler(object):
 
         write_success_flag: bool = False
         try:
-            _LOGGER.info("Handling DB write operations...")
+            print("Handling DB write operations...")
             updated_image_entries, update_flag = cls._run_write_operations(
                 article,
                 validated_doc,
@@ -418,8 +413,8 @@ class PostUpdateHandler(object):
                 tags_updated=tags_updated,
                 images_created=image_entries,
             )
-            _LOGGER.info("Done with writing to the DB.")
-            _LOGGER.info("Handling image saving...")
+            print("Done with writing to the DB.")
+            print("Handling image saving...")
             # Logic here is to ensure mypy we're using non-None input on
             # buffers and entries
             if image_buffers and updated_image_entries:
@@ -429,7 +424,7 @@ class PostUpdateHandler(object):
                     validated_doc.image_info,
                     archive,
                 )
-                _LOGGER.info(
+                print(
                     "Complete saving {num_saved_images:d} images.".format(
                         num_saved_images=num_saved_images,
                     )
@@ -437,7 +432,7 @@ class PostUpdateHandler(object):
             write_success_flag = True
         finally:
             if not write_success_flag:
-                _LOGGER.error(
+                print(
                     "Error happened during writing process. Running cleanup..."
                 )
                 cls._error_cleanup(image_entries)
@@ -527,7 +522,7 @@ class PostUpdateHandler(object):
 
         # Image data's ready. Modify converted XML then dump to DB entry as needed.
         if is_new_article or compiled_data_updated:
-            _LOGGER.info("Need to create or update compiled XML. Processing...")
+            print("Need to create or update compiled XML. Processing...")
             image_entries = chain(
                 images_created or (),
                 images_kept or (),
@@ -557,7 +552,7 @@ class PostUpdateHandler(object):
                     archive, image_info[image_entry.alias]
                 ) as image_stream:
                     save_image(image_entry, img_stream=image_stream)
-                    _LOGGER.info(
+                    print(
                         "Original image '{file_name:s}'({alias:s}) saved.".format(
                             file_name=image_entry.file_name,
                             alias=image_entry.alias,
@@ -565,7 +560,7 @@ class PostUpdateHandler(object):
                     )
             else:
                 save_image(image_entry, image_buffer)
-                _LOGGER.info(
+                print(
                     "Resized image '{file_name:s}({alias:s}/{resolution:s})' saved.".format(
                         file_name=image_entry.file_name,
                         alias=image_entry.alias,
@@ -674,7 +669,7 @@ class PostUpdateHandler(object):
     def _error_cleanup(image_entries: Optional[List[Image]]) -> None:
         if image_entries:
             for entry in image_entries:
-                _LOGGER.warning(
+                print(
                     "Try removing file '{file_name:s}'...".format(
                         file_name=entry.file_name
                     )

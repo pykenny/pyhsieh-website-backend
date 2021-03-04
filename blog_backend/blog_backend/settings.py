@@ -143,7 +143,6 @@ if DEBUG:
 # Recipe: https://lincolnloop.com/blog/disabling-error-emails-django/
 logging_dict = deepcopy(DEFAULT_LOGGING)
 logging_dict["loggers"]["django"]["handlers"] = ["console"]
-# logging_dict
 
 # Modified from this source:
 # https://djangodeployment.readthedocs.io/en/latest/07-settings.html#logging
@@ -176,3 +175,6 @@ if not DEBUG:
     }
 
 LOGGING = logging_dict
+
+# We don't serve static file, but it's needed in debug mode
+STATIC_URL = "/static/"

@@ -279,9 +279,7 @@ class PostUpdateHandler(object):
                         updated_images.remove(entry.alias)
             else:
                 removed_images.add(entry.alias)
-                print(
-                    "Detect image removed: {alias:s}".format(alias=entry.alias)
-                )
+                print("Detect image removed: {alias:s}".format(alias=entry.alias))
 
         created_images = updated_images - removed_images  # New + Renewed
         deleted_images = removed_images | renewed_images  # Removed + Renewed
@@ -391,9 +389,7 @@ class PostUpdateHandler(object):
             data=validated_doc.raw_document,
         )
         tags_updated = validated_doc.tags
-        print(
-            "Article tags: {tag_list:s} .".format(tag_list=", ".join(tags_updated))
-        )
+        print("Article tags: {tag_list:s} .".format(tag_list=", ".join(tags_updated)))
         print(
             "Loading data of {num_images:d} images...".format(
                 num_images=len(validated_doc.image_info)
@@ -432,9 +428,7 @@ class PostUpdateHandler(object):
             write_success_flag = True
         finally:
             if not write_success_flag:
-                print(
-                    "Error happened during writing process. Running cleanup..."
-                )
+                print("Error happened during writing process. Running cleanup...")
                 cls._error_cleanup(image_entries)
 
     @classmethod

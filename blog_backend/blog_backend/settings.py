@@ -142,7 +142,7 @@ if DEBUG:
 # Disable mailing on critical events
 # Recipe: https://lincolnloop.com/blog/disabling-error-emails-django/
 logging_dict = deepcopy(DEFAULT_LOGGING)
-logging_dict['loggers']['django']['handlers'] = ['console']
+logging_dict["loggers"]["django"]["handlers"] = ["console"]
 # logging_dict
 
 # Modified from this source:
@@ -151,25 +151,27 @@ logging_dict['loggers']['django']['handlers'] = ['console']
 if not DEBUG:
     LOG_DIR = get_env_value("LOG_DIR")
     LOG_BASE_NAME = get_env_value("LOG_BASE_NAME")
-    logging_dict['formatters']['default'] = {'format': '[%(asctime)s] %(levelname)s: %(message)s'}
-    logging_dict['handlers']['file'] = {
-        'class': 'logging.handlers.'
-                 'TimedRotatingFileHandler',
-        'filename': path_join(LOG_DIR, '{base:s}{suffix:s}'.format(base=LOG_BASE_NAME, suffix='.log')),
-        'when': 'midnight',
-        'backupCount': 60,
-        'formatter': 'default',
+    logging_dict["formatters"]["default"] = {
+        "format": "[%(asctime)s] %(levelname)s: %(message)s"
     }
-    logging_dict['root'] = {'handlers': ['file'], 'level': 'INFO'}
+    logging_dict["handlers"]["file"] = {
+        "class": "logging.handlers." "TimedRotatingFileHandler",
+        "filename": path_join(
+            LOG_DIR, "{base:s}{suffix:s}".format(base=LOG_BASE_NAME, suffix=".log")
+        ),
+        "when": "midnight",
+        "backupCount": 60,
+        "formatter": "default",
+    }
+    logging_dict["root"] = {"handlers": ["file"], "level": "INFO"}
 
 # Cache
 if not DEBUG:
-    cache_dir = get_env_value('CACHE_DIR')
+    cache_dir = get_env_value("CACHE_DIR")
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.'
-                       'FileBasedCache',
-            'LOCATION': cache_dir,
+        "default": {
+            "BACKEND": "django.core.cache.backends.filebased." "FileBasedCache",
+            "LOCATION": cache_dir,
         }
     }
 

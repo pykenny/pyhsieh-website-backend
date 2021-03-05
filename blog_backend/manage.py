@@ -7,7 +7,10 @@ import dotenv
 
 
 def main():
-    dotenv.read_dotenv()
+    if os.environ.get("DOTENV_PATH", None):
+        dotenv.read_dotenv(os.environ["DOTENV_PATH"])
+    else:
+        dotenv.read_dotenv()
 
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "blog_backend.settings")

@@ -53,11 +53,13 @@ ALLOWED_HOSTS = (
 # Application definition
 
 INSTALLED_APPS = [
-    "django_extensions",
     "safedelete",
     "resource_management.apps.ResourceManagementConfig",
     "django.contrib.contenttypes",
 ]
+
+if DEBUG:
+    INSTALLED_APPS.insert(0, "django_extensions")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

@@ -4,7 +4,7 @@ pillow
 beautifulsoup4
 django-safedelete
 django-dotenv
-uwsgi
+gunicorn
 psycopg2
 mypy
 django-stubs

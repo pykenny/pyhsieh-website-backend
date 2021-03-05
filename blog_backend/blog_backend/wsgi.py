@@ -14,7 +14,11 @@ from django.core.wsgi import get_wsgi_application
 
 import dotenv
 
-dotenv.read_dotenv(Path(__file__).resolve().parent.parent / ".env")
+dotenv.read_dotenv(
+    os.environ["DOTENV_PATH"]
+    if os.environ.get("DOTENV_PATH", None)
+    else Path(__file__).resolve().parent.parent / ".env"
+)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "blog_backend.settings")
 
 application = get_wsgi_application()

@@ -34,7 +34,9 @@ def get_env_value(name):
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-dotenv.read_dotenv(BASE_DIR / ".env")
+dotenv.read_dotenv(
+    environ["DOTENV_PATH"] if environ.get("DOTENV_PATH", None) else BASE_DIR / ".env"
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/

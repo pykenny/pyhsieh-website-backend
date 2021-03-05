@@ -82,6 +82,9 @@ LOG_BASE_NAME="Base name for log files (prod mode)"
 CACHE_DIR="Directory for file-based cache (prod mode)"
 
 ALLOWED_HOSTS="Comma-separated List. e.g.: localhost,127.0.0.1,www.mysite.com"
+
+# Optional if you define .env file in somewhere else
+DOTENV_PATH="Path to dotenv file outside of 'blog_backend' directory"
 ```
 
 ### Database Initialization

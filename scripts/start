@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+pushd blog_backend && {
+  gunicorn blog_backend.wsgi:application
+} || popd || exit ;

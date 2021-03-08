@@ -87,7 +87,9 @@ class ArticleOperations(BaseOperation[Article]):
         if prefetch_for_blog:
             article_list = article_list.prefetch_related("tags_of_article__tag")
         article_list = article_list.order_by("-id")[offset : (offset + page_size + 1)]
-        if not article_list:
+        # TODO: Set up test for initial state without article
+        #       Expected behavior: Only pass when on page one, without tag filtering
+        if (not article_list) and ((page > 1) or tag):
             raise ObjectDoesNotExist()
         has_prev_page = len(article_list) == page_size + 1
 
